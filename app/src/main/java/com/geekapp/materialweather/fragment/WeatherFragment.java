@@ -12,14 +12,27 @@ import android.view.ViewGroup;
 
 import com.geekapp.materialweather.R;
 import com.geekapp.materialweather.adapter.SimpleAdapter;
+import com.geekapp.materialweather.model.WeatherResponse;
+import com.geekapp.materialweather.retrofit.ClientApi;
+import com.geekapp.materialweather.retrofit.ServiceGenerator;
+import com.geekapp.materialweather.util.CommonUtil;
+import com.geekapp.materialweather.util.Encrypt;
+import com.geekapp.materialweather.util.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.henrytao.recyclerview.BaseAdapter;
 import me.henrytao.recyclerview.SimpleRecyclerViewAdapter;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class WeatherFragment extends Fragment implements ObservableScrollView {
 
@@ -53,6 +66,10 @@ public class WeatherFragment extends Fragment implements ObservableScrollView {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initUIViews();
+    }
+
+    public void initUIViews(){
         RecyclerView.Adapter adapter = new SimpleRecyclerViewAdapter(new SimpleAdapter<>(getSampleData(getArgTitle(), getArgCount()), null)) {
             @Override
             public RecyclerView.ViewHolder onCreateFooterViewHolder(LayoutInflater layoutInflater, ViewGroup viewGroup) {
@@ -73,11 +90,11 @@ public class WeatherFragment extends Fragment implements ObservableScrollView {
         mRecyclerView.setAdapter(adapter);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
         ButterKnife.bind(this, view);
+        getWeatherRequest();
         return view;
     }
 
@@ -127,6 +144,54 @@ public class WeatherFragment extends Fragment implements ObservableScrollView {
             return bundle.getString(ARG_TITLE);
         }
         return "";
+    }
+
+
+    public void getWeatherRequest1(){
+
+        ClientApi clientApi = ServiceGenerator.createService(ClientApi.class, ClientApi.API_URL);
+        String date = CommonUtil.formatTimeNormal(new Date());
+        String areaId = "101010100";
+        clientApi.getWeatherData(areaId,ClientApi.FORECAST_NORMAL,date,ClientApi.APPID, Encrypt.standardURLEncoder(areaId,ClientApi.FORECAST_NORMAL,date))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Observer<WeatherResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        LogUtil.d("onCompleted");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        LogUtil.d("onError");
+                    }
+
+                    @Override
+                    public void onNext(WeatherResponse weatherResponse) {
+                        LogUtil.d("onNext");
+                    }
+                });
+
+    }
+
+    public void getWeatherRequest(){
+
+        ClientApi clientApi = ServiceGenerator.createService(ClientApi.class,ClientApi.API_URL);
+        String date = CommonUtil.formatTimeNormal(new Date());
+        String areaId = "101010100";
+        clientApi.getWeatherData(areaId, ClientApi.INDEX_NORMAL, date, ClientApi.APPID, Encrypt.standardURLEncoder(areaId, ClientApi.INDEX_NORMAL, date),
+                new Callback<WeatherResponse>() {
+                    @Override
+                    public void success(WeatherResponse weatherResponse, Response response) {
+                        LogUtil.d("success");
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        LogUtil.d("Error");
+                    }
+        });
+
     }
 
 }

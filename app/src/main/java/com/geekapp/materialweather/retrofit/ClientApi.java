@@ -8,14 +8,15 @@ import retrofit.http.Query;
 import rx.Observable;
 
 public interface ClientApi {
-    public static final String API_URL = "http://api.openweathermap.org/data/2.5";
-    public static final String APPID = "c80bd8332dc294a3b678a42c4ca97e2c";
-
+    public static final String API_URL = "http://open.weather.com.cn";
+    public static final String APPID = "b82a9c10f8f857eb";
+    public static final String INDEX_NORMAL = "index_v";
+    public static final String FORECAST_NORMAL = "forecast_v";
     //use Retrofit and RxJava
-    @GET("/weather")
-    Observable<WeatherResponse> getWeather(@Query("q") String cityName, @Query("APPID") String appId);
+    @GET("/data/")
+    Observable<WeatherResponse> getWeatherData(@Query("areaid") String areaId, @Query("type") String type, @Query("date") String date, @Query("appid") String appId, @Query("key") String key);
 
     //just use Retrofit
-    @GET("/weather")
-    void getWeather(@Query("q") String cityName, @Query("APPID") String appId, Callback<WeatherResponse> callback);
+    @GET("/data/")
+    void getWeatherData(@Query("areaid") String areaId, @Query("type") String type, @Query("date") String date, @Query("appid") String appId, @Query("key") String key, Callback<WeatherResponse> callback);
 }
