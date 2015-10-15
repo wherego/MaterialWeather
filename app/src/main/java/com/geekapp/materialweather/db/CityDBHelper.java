@@ -82,6 +82,28 @@ public class CityDBHelper extends SQLiteOpenHelper {
         return infoList;
     }
 
+    public String getCityDailyInfoByName(String name) {
+        SQLiteDatabase db = instance.getWritableDatabase();
+        String dailyWeather = "";
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, CityColumns._ID + " desc");
+        if (cursor == null) {
+            return "";
+        }
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                if (name.equals(cursor.getString(cursor.getColumnIndex(CityColumns.CITY_NAME)))) {
+                    dailyWeather = cursor.getString(cursor.getColumnIndex(CityColumns.DAILY_WEATHER));
+                    LogUtil.d("name:" + name + dailyWeather + "data:");
+                    break;
+                }
+            }
+        }
+
+        cursor.close();
+        //db.close();
+        return dailyWeather;
+    }
+
     public void addCityInfoByType(String data, String type) {
         SQLiteDatabase db = instance.getWritableDatabase();
         LogUtil.d("add data");

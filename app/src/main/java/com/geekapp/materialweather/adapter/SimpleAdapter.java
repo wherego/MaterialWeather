@@ -24,26 +24,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.geekapp.materialweather.R;
+import com.geekapp.materialweather.model.DailyWeatherRespond;
 
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * Created by henrytao on 9/27/15.
- */
+
 public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHolder> {
 
-    private final List<T> mData;
-
     private final OnItemClickListener mOnItemClickListener;
+    private List<T> mData;
 
     public SimpleAdapter(List<T> data, OnItemClickListener<T> onItemClickListener) {
         mData = data;
         mOnItemClickListener = onItemClickListener;
     }
 
+    public void setData(List<T> data) {
+        this.mData = data;
+        this.notifyDataSetChanged();
+    }
     @Override
     public int getItemCount() {
         return mData != null ? mData.size() : 0;
@@ -70,9 +72,14 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.title)
-        TextView vTitle;
-        private Object mData;
+        @Bind(R.id.description)
+        TextView description;
+        @Bind(R.id.temp)
+        TextView temp;
+        @Bind(R.id.date)
+        TextView date;
+
+        private DailyWeatherRespond.CityEntity mData;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent, final OnItemClickListener onItemClickListener) {
             super(createView(inflater, parent, R.layout.simple_adapter_item_simple));
@@ -92,8 +99,9 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
         }
 
         public void bind(Object data) {
-            mData = data;
-            vTitle.setText(data.toString());
+            mData = (DailyWeatherRespond.CityEntity) data;
+            description.setText(mData.weather.get(0).description);
+            temp.setText((int) mData.temp.min + "℃~" + (int) mData.temp.max + "℃");
         }
     }
 }

@@ -1,11 +1,13 @@
 package com.geekapp.materialweather.fragment;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.LayoutRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.geekapp.materialweather.R;
 import com.geekapp.materialweather.adapter.SimpleAdapter;
+import com.geekapp.materialweather.db.CityDBHelper;
 import com.geekapp.materialweather.model.CurWeatherResponse;
 import com.geekapp.materialweather.model.DailyWeatherRespond;
 import com.geekapp.materialweather.model.DayHourWeatherRespond;
@@ -20,6 +23,7 @@ import com.geekapp.materialweather.retrofit.ClientApi;
 import com.geekapp.materialweather.retrofit.ServiceGenerator;
 import com.geekapp.materialweather.util.CommonUtil;
 import com.geekapp.materialweather.util.LogUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,27 +38,27 @@ import rx.schedulers.Schedulers;
 
 public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, ObservableScrollView {
 
-    private static final String ARG_COUNT = "ARG_COUNT";
     private static final String ARG_HEADER_LAYOUT = "ARG_HEADER_LAYOUT";
     private static final String ARG_TITLE = "ARG_TITLE";
-
+    public RecyclerView.Adapter mAdapter;
+    public SimpleAdapter mSimpleAdapter;
+    public List<DailyWeatherRespond.CityEntity> dailyList = new ArrayList<>();
+    public CityDBHelper mDatabase;
     @Bind(android.R.id.list)
     RecyclerView mRecyclerView;
     @Bind(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
-
     public WeatherFragment() {
     }
 
-    public static WeatherFragment newInstance(String title, int count) {
-        return WeatherFragment.newInstance(title, count, 0);
+    public static WeatherFragment newInstance(String title) {
+        return WeatherFragment.newInstance(title, 0);
     }
 
-    public static WeatherFragment newInstance(String title, int count, @LayoutRes int headerLayout) {
+    public static WeatherFragment newInstance(String title, @LayoutRes int headerLayout) {
         WeatherFragment fragment = new WeatherFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ARG_TITLE, title);
-        bundle.putInt(ARG_COUNT, count);
         bundle.putInt(ARG_HEADER_LAYOUT, headerLayout);
         fragment.setArguments(bundle);
         return fragment;
@@ -70,11 +74,27 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
         super.onViewCreated(view, savedInstanceState);
 
         initUIViews();
-        getWeatherOfCurCity();
+        //getWeatherOfCurCity();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String data = mDatabase.getCityDailyInfoByName(getArgTitle());
+        if (!TextUtils.isEmpty(data)) {
+            dailyList.clear();
+            LogUtil.d("data is not empty");
+            dailyList = new Gson().fromJson(data, DailyWeatherRespond.class).cityEntity;
+        } else {
+            LogUtil.d("data is empty");
+            getWeatherOfCurCity();
+        }
     }
 
     public void initUIViews(){
-        RecyclerView.Adapter adapter = new SimpleRecyclerViewAdapter(new SimpleAdapter<>(getSampleData(getArgTitle(), getArgCount()), null)) {
+
+        mSimpleAdapter = new SimpleAdapter<>(dailyList, null);
+        mAdapter = new SimpleRecyclerViewAdapter(mSimpleAdapter) {
             @Override
             public RecyclerView.ViewHolder onCreateFooterViewHolder(LayoutInflater layoutInflater, ViewGroup viewGroup) {
                 return null;
@@ -91,7 +111,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
         };
         mRecyclerView.hasFixedSize();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(mAdapter);
 
         int actionBarSize = ResourceUtils.getActionBarSize(getContext());
         int progressViewStart = getResources().getDimensionPixelSize(R.dimen.app_bar_height) - actionBarSize;
@@ -103,6 +123,10 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                 android.R.color.holo_orange_dark, android.R.color.holo_blue_dark);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark, android.R.color.holo_blue_dark);
+        mSwipeRefreshLayout.setRefreshing(true);
+
+        //database
+        mDatabase = CityDBHelper.getInstance(getActivity());
     }
 
     @Override
@@ -125,22 +149,6 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
         return null;
     }
 
-    protected List<String> getSampleData(String title, int count) {
-        List<String> data = new ArrayList<>();
-        int i = 0;
-        for (int n = count; i < n; i++) {
-            data.add(String.format("%s %d", title, i));
-        }
-        return data;
-    }
-
-    private int getArgCount() {
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            return bundle.getInt(ARG_COUNT);
-        }
-        return 0;
-    }
 
     private int getArgHeaderLayout() {
         Bundle bundle = getArguments();
@@ -161,7 +169,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
     public void getWeatherOfCurCity() {
         ClientApi clientApi = ServiceGenerator.createService(ClientApi.class, ClientApi.API_URL);
         //get cur weather
-        clientApi.getWeatherByCityName("shenzhen", ClientApi.LAN_CN, ClientApi.UNITS_M, ClientApi.APPID)
+        clientApi.getWeatherByCityName(getArgTitle(), ClientApi.LAN_CN, ClientApi.UNITS_M, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<CurWeatherResponse>() {
@@ -183,7 +191,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                     }
                 });
         //get daily weather
-        clientApi.getDailyWeatherByCityName("shenzhen", ClientApi.UNITS_M, "5", ClientApi.LAN_CN, ClientApi.APPID)
+        clientApi.getDailyWeatherByCityName(getArgTitle(), ClientApi.UNITS_M, "5", ClientApi.LAN_CN, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DailyWeatherRespond>() {
@@ -194,16 +202,22 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
 
                     @Override
                     public void onError(Throwable e) {
+                        mSwipeRefreshLayout.setRefreshing(false);
                         LogUtil.d("get daily weather error");
                     }
 
                     @Override
                     public void onNext(DailyWeatherRespond dailyWeatherRespond) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        mSimpleAdapter.setData(dailyWeatherRespond.cityEntity);
+                        mDatabase.addCityInfoByType(getArgTitle(), CityDBHelper.CityColumns.CITY_NAME);
+                        mDatabase.addCityInfoByType(new Gson().toJson(dailyWeatherRespond), CityDBHelper.CityColumns.DAILY_WEATHER);
+
                         LogUtil.d(dailyWeatherRespond.city.name + CommonUtil.formatDayAndMonth(dailyWeatherRespond.cityEntity.get(0).dt));
                     }
                 });
         //get day hour weather
-        clientApi.getDayHourWeatherByCityName("shenzhen", ClientApi.UNITS_M, ClientApi.LAN_CN, ClientApi.APPID)
+        clientApi.getDayHourWeatherByCityName(getArgTitle(), ClientApi.UNITS_M, ClientApi.LAN_CN, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DayHourWeatherRespond>() {

@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.View;
 
 import com.geekapp.materialweather.fragment.ObservableScrollView;
+import com.geekapp.materialweather.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,5 +68,9 @@ public class BaseViewPagerAdapter extends FragmentPagerAdapter implements PagerA
     public void addFragment(Fragment fragment, String title) {
         mFragments.add(fragment);
         mTitles.add(title);
+    }
+
+    public List<Fragment> getmFragments() {
+        return mFragments;
     }
 }

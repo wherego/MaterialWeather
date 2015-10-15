@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.geekapp.materialweather.R;
 import com.geekapp.materialweather.adapter.ViewPagerRunnableAdapter;
+import com.geekapp.materialweather.util.LogUtil;
 
 import butterknife.Bind;
 
@@ -35,17 +36,18 @@ public class TabFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        LogUtil.d("onViewCreated");
         vCollapsingToolbarLayout.setTitleEnabled(false);
 
-        ViewPagerRunnableAdapter adapter = new ViewPagerRunnableAdapter(getChildFragmentManager());
-        adapter.addFragment(WeatherFragment.newInstance("Cat", 100,
-                R.layout.fragment_header_spacing), "Cat");
-        adapter.addFragment(WeatherFragment.newInstance("Dog", 100,
-                R.layout.fragment_header_spacing), "Dog");
-        adapter.addFragment(WeatherFragment.newInstance("Mouse", 100,
-                R.layout.fragment_header_spacing), "Mouse");
-        adapter.addFragment(WeatherFragment.newInstance("Chicken", 100,
-                R.layout.fragment_header_spacing), "Chicken");
+        final ViewPagerRunnableAdapter adapter = new ViewPagerRunnableAdapter(getChildFragmentManager());
+        adapter.addFragment(WeatherFragment.newInstance("shenzhen",
+                R.layout.fragment_header_spacing), "深圳");
+        adapter.addFragment(WeatherFragment.newInstance("guangzhou",
+                R.layout.fragment_header_spacing), "广州");
+        adapter.addFragment(WeatherFragment.newInstance("shanghai",
+                R.layout.fragment_header_spacing), "上海");
+        adapter.addFragment(WeatherFragment.newInstance("beijing",
+                R.layout.fragment_header_spacing), "北京");
 
         mViewPager.setAdapter(adapter);
         //add animation to viewpager
