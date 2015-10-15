@@ -1,4 +1,4 @@
-package com.geekapp.materialweather.ui;
+package com.geekapp.materialweather.activity;
 
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;

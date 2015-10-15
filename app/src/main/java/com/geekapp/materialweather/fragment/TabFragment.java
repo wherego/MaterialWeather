@@ -48,8 +48,10 @@ public class TabFragment extends BaseFragment {
                 R.layout.fragment_header_spacing), "Chicken");
 
         mViewPager.setAdapter(adapter);
+        //add animation to viewpager
+        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
         mTabLayout.setupWithViewPager(mViewPager);
-        //设置tablayout item 是否可以滑动,MODE_SCROLLABLE代表可以滑动，MODE_FIXED代表不可滑动
+        //set item ,MODE_SCROLLABLE = can scroll，MODE_FIXED = not
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);
     }
 }
