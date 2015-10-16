@@ -16,11 +16,15 @@
 
 package com.geekapp.materialweather.adapter;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.geekapp.materialweather.R;
@@ -35,15 +39,19 @@ import butterknife.ButterKnife;
 public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHolder> {
 
     private final OnItemClickListener mOnItemClickListener;
-    private List<T> mData;
+    private List<DailyWeatherRespond.CityEntity> mData;
+    private int lastPosition = -1;
+    private Context mContext;
 
-    public SimpleAdapter(List<T> data, OnItemClickListener<T> onItemClickListener) {
+    public SimpleAdapter(Context context, List<DailyWeatherRespond.CityEntity> data, OnItemClickListener<T> onItemClickListener) {
         mData = data;
+        mContext = context;
         mOnItemClickListener = onItemClickListener;
     }
 
-    public void setData(List<T> data) {
+    public void setData(List<DailyWeatherRespond.CityEntity> data) {
         this.mData = data;
+        lastPosition = -1;
         this.notifyDataSetChanged();
     }
     @Override
@@ -54,6 +62,8 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bind(getItem(position));
+        // Here you apply the animation when the view is bound
+        setAnimation(holder.container, position);
     }
 
     @Override
@@ -61,8 +71,21 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
         return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mOnItemClickListener);
     }
 
-    public T getItem(int position) {
+    public DailyWeatherRespond.CityEntity getItem(int position) {
         return mData != null && position >= 0 && position < mData.size() ? mData.get(position) : null;
+    }
+
+    /**
+     * Here is the key method to apply the animation
+     */
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            animation.setDuration(500);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     public interface OnItemClickListener<I> {
@@ -72,6 +95,8 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        @Bind(R.id.container)
+        RelativeLayout container;
         @Bind(R.id.description)
         TextView description;
         @Bind(R.id.temp)
@@ -98,8 +123,8 @@ public class SimpleAdapter<T> extends RecyclerView.Adapter<SimpleAdapter.ViewHol
             return inflater.inflate(layoutId, parent, false);
         }
 
-        public void bind(Object data) {
-            mData = (DailyWeatherRespond.CityEntity) data;
+        public void bind(DailyWeatherRespond.CityEntity data) {
+            mData = data;
             description.setText(mData.weather.get(0).description);
             temp.setText((int) mData.temp.min + "℃~" + (int) mData.temp.max + "℃");
         }

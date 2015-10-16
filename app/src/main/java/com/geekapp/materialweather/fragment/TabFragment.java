@@ -51,7 +51,7 @@ public class TabFragment extends BaseFragment {
 
         mViewPager.setAdapter(adapter);
         //add animation to viewpager
-        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mViewPager.setPageTransformer(true, new DepthPageTransformer());
         mTabLayout.setupWithViewPager(mViewPager);
         //set item ,MODE_SCROLLABLE = can scroll，MODE_FIXED = not
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);

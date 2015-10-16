@@ -1,8 +1,6 @@
 package com.geekapp.materialweather.fragment;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.LayoutRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,19 +79,21 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
     public void onResume() {
         super.onResume();
         String data = mDatabase.getCityDailyInfoByName(getArgTitle());
-        if (!TextUtils.isEmpty(data)) {
+        if (mDatabase.dataTypeExist(getArgTitle()) && !TextUtils.isEmpty(data)) {
             dailyList.clear();
             LogUtil.d("data is not empty");
             dailyList = new Gson().fromJson(data, DailyWeatherRespond.class).cityEntity;
+            mSimpleAdapter.setData(dailyList);
         } else {
             LogUtil.d("data is empty");
+            mSwipeRefreshLayout.setRefreshing(true);
             getWeatherOfCurCity();
         }
     }
 
     public void initUIViews(){
 
-        mSimpleAdapter = new SimpleAdapter<>(dailyList, null);
+        mSimpleAdapter = new SimpleAdapter<>(getActivity(), dailyList, null);
         mAdapter = new SimpleRecyclerViewAdapter(mSimpleAdapter) {
             @Override
             public RecyclerView.ViewHolder onCreateFooterViewHolder(LayoutInflater layoutInflater, ViewGroup viewGroup) {
@@ -123,7 +123,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                 android.R.color.holo_orange_dark, android.R.color.holo_blue_dark);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark, android.R.color.holo_blue_dark);
-        mSwipeRefreshLayout.setRefreshing(true);
+        //mSwipeRefreshLayout.setRefreshing(true);
 
         //database
         mDatabase = CityDBHelper.getInstance(getActivity());
@@ -131,14 +131,17 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
+        /*new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (isAdded() && mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
-        }, 3000);
+        }, 3000);*/
+        dailyList.clear();
+        mSimpleAdapter.setData(dailyList);
+        getWeatherOfCurCity();
     }
 
     @Override
@@ -169,7 +172,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
     public void getWeatherOfCurCity() {
         ClientApi clientApi = ServiceGenerator.createService(ClientApi.class, ClientApi.API_URL);
         //get cur weather
-        clientApi.getWeatherByCityName(getArgTitle(), ClientApi.LAN_CN, ClientApi.UNITS_M, ClientApi.APPID)
+        /*clientApi.getWeatherByCityName(getArgTitle(), ClientApi.LAN_CN, ClientApi.UNITS_M, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<CurWeatherResponse>() {
@@ -189,7 +192,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                         Log.i("App", "lat:" + curWeatherResponse.coord.lat + "lon:" + curWeatherResponse.coord.lon);
                         Log.i("App", "city:" + curWeatherResponse.name);
                     }
-                });
+                });*/
         //get daily weather
         clientApi.getDailyWeatherByCityName(getArgTitle(), ClientApi.UNITS_M, "5", ClientApi.LAN_CN, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
@@ -197,7 +200,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                 .subscribe(new Observer<DailyWeatherRespond>() {
                     @Override
                     public void onCompleted() {
-
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
 
                     @Override
@@ -210,14 +213,13 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                     public void onNext(DailyWeatherRespond dailyWeatherRespond) {
                         mSwipeRefreshLayout.setRefreshing(false);
                         mSimpleAdapter.setData(dailyWeatherRespond.cityEntity);
-                        mDatabase.addCityInfoByType(getArgTitle(), CityDBHelper.CityColumns.CITY_NAME);
-                        mDatabase.addCityInfoByType(new Gson().toJson(dailyWeatherRespond), CityDBHelper.CityColumns.DAILY_WEATHER);
+                        mDatabase.commitCityInfoByType(getArgTitle(), new Gson().toJson(dailyWeatherRespond), CityDBHelper.CityColumns.DAILY_WEATHER);
 
                         LogUtil.d(dailyWeatherRespond.city.name + CommonUtil.formatDayAndMonth(dailyWeatherRespond.cityEntity.get(0).dt));
                     }
                 });
         //get day hour weather
-        clientApi.getDayHourWeatherByCityName(getArgTitle(), ClientApi.UNITS_M, ClientApi.LAN_CN, ClientApi.APPID)
+        /*clientApi.getDayHourWeatherByCityName(getArgTitle(), ClientApi.UNITS_M, ClientApi.LAN_CN, ClientApi.APPID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DayHourWeatherRespond>() {
@@ -235,7 +237,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                     public void onNext(DayHourWeatherRespond dayHourWeatherRespond) {
                         LogUtil.d(dayHourWeatherRespond.city.name + dayHourWeatherRespond.list.get(0).dt_txt);
                     }
-                });
+                });*/
     }
 
 

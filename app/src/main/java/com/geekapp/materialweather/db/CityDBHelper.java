@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.geekapp.materialweather.util.LogUtil;
 
@@ -93,7 +94,7 @@ public class CityDBHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 if (name.equals(cursor.getString(cursor.getColumnIndex(CityColumns.CITY_NAME)))) {
                     dailyWeather = cursor.getString(cursor.getColumnIndex(CityColumns.DAILY_WEATHER));
-                    LogUtil.d("name:" + name + dailyWeather + "data:");
+                    LogUtil.d("name:" + name + dailyWeather);
                     break;
                 }
             }
@@ -104,17 +105,51 @@ public class CityDBHelper extends SQLiteOpenHelper {
         return dailyWeather;
     }
 
-    public void addCityInfoByType(String data, String type) {
+    public boolean dataTypeExist(String name) {
+
+        SQLiteDatabase db = instance.getWritableDatabase();
+        Boolean flag = false;
+        Cursor cursor = db.query(TABLE_NAME, null, CityColumns.CITY_NAME
+                + "=?", new String[]{name}, null, null, null);
+        flag = cursor.moveToFirst();
+        LogUtil.d(flag.toString());
+        cursor.close();
+
+        return flag;
+    }
+
+    public void commitCityInfoByType(String name, String data, String type) {
+
+        if (dataTypeExist(name)) {
+            updateCityInfoByType(name, data, type);
+        } else {
+            addCityInfoByType(name, data, type);
+        }
+    }
+
+    public void addCityInfoByType(String name, String data, String type) {
         SQLiteDatabase db = instance.getWritableDatabase();
         LogUtil.d("add data");
         ContentValues cv = new ContentValues();
-        cv.put(type, data);
+        cv.put(CityColumns.CITY_NAME, name);
+        if (data != null) {
+            cv.put(type, data);
+        }
         db.insert(TABLE_NAME, null, cv);
     }
 
-    public void deleteCityInfoByName(String cityName) {
+    public void updateCityInfoByType(String name, String data, String type) {
         SQLiteDatabase db = instance.getWritableDatabase();
-        db.delete(TABLE_NAME, CityColumns.CITY_NAME + "=?", new String[]{cityName});
+        LogUtil.d("add data");
+        ContentValues cv = new ContentValues();
+        cv.put(CityColumns.CITY_NAME, name);
+        cv.put(type, data);
+        db.update(TABLE_NAME, cv, CityColumns.CITY_NAME + "=?", new String[]{name});
+    }
+
+    public void deleteCityInfoByName(String name) {
+        SQLiteDatabase db = instance.getWritableDatabase();
+        db.delete(TABLE_NAME, CityColumns.CITY_NAME + "=?", new String[]{name});
     }
 
     public static class CityColumns implements BaseColumns {

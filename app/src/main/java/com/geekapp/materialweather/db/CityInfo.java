@@ -1,8 +1,5 @@
 package com.geekapp.materialweather.db;
 
-/**
- * Created by james.li on 2015/10/15.
- */
 public class CityInfo {
     private String cityName;
     private String updateTime;
