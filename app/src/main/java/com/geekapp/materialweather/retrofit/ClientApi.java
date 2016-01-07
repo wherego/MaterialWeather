@@ -4,7 +4,6 @@ import com.geekapp.materialweather.model.CurWeatherResponse;
 import com.geekapp.materialweather.model.DailyWeatherRespond;
 import com.geekapp.materialweather.model.DayHourWeatherRespond;
 
-import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
 import rx.Observable;

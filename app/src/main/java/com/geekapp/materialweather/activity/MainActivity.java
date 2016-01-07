@@ -1,5 +1,6 @@
 package com.geekapp.materialweather.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         boolean isFitsSystemWindows = ViewCompat.getFitsSystemWindows(mDrawerLayout);
-        if (isFitsSystemWindows) {
+        if (isFitsSystemWindows && Build.VERSION.SDK_INT >= 19) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
