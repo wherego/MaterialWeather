@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import com.geekapp.materialweather.R;
 import com.geekapp.materialweather.adapter.SimpleAdapter;
 import com.geekapp.materialweather.db.CityDBHelper;
+import com.geekapp.materialweather.model.CurWeatherResponse;
 import com.geekapp.materialweather.model.DailyWeatherRespond;
 import com.geekapp.materialweather.retrofit.ClientApi;
 import com.geekapp.materialweather.retrofit.ServiceGenerator;
@@ -32,7 +34,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, ObservableScrollView {
-
+    private static final String TAG = "WeatherFragment";
     private static final String ARG_HEADER_LAYOUT = "ARG_HEADER_LAYOUT";
     private static final String ARG_TITLE = "ARG_TITLE";
     public RecyclerView.Adapter mAdapter;
@@ -235,6 +237,26 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                         LogUtil.d(dayHourWeatherRespond.city.name + dayHourWeatherRespond.list.get(0).dt_txt);
                     }
                 });*/
+
+        clientApi.findCity("guilin",ClientApi.APPID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CurWeatherResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onCompleted: ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError: "+e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(CurWeatherResponse curWeatherResponse) {
+                        Log.d(TAG, "onNext: "+curWeatherResponse.toString());
+                    }
+                });
     }
 
 

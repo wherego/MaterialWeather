@@ -17,6 +17,10 @@ public interface ClientApi {
     public static final String UNITS_M = "metric";
     public static final String UNITS_I = "imperial";
 
+    //http://openweathermap.org/find?q=
+    @GET("/find")
+    Observable<CurWeatherResponse> findCity(@Query("q") String cityName,String appId);
+
     //api.openweathermap.org/data/2.5/weather?q=London
     @GET("/weather")
     Observable<CurWeatherResponse> getWeatherByCityName(@Query("q") String cityName, @Query("lang") String language,
