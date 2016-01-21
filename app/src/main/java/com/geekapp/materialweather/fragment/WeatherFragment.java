@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.geekapp.materialweather.R;
-import com.geekapp.materialweather.adapter.SimpleAdapter;
+import com.geekapp.materialweather.adapter.CommonAdapter;
 import com.geekapp.materialweather.db.CityDBHelper;
 import com.geekapp.materialweather.model.CurWeatherResponse;
 import com.geekapp.materialweather.model.DailyWeatherRespond;
@@ -21,6 +21,8 @@ import com.geekapp.materialweather.retrofit.ServiceGenerator;
 import com.geekapp.materialweather.util.CommonUtil;
 import com.geekapp.materialweather.util.LogUtil;
 import com.google.gson.Gson;
+import com.twotoasters.jazzylistview.JazzyHelper;
+import com.twotoasters.jazzylistview.recyclerview.JazzyRecyclerViewScrollListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
     private static final String ARG_HEADER_LAYOUT = "ARG_HEADER_LAYOUT";
     private static final String ARG_TITLE = "ARG_TITLE";
     public RecyclerView.Adapter mAdapter;
-    public SimpleAdapter mSimpleAdapter;
+    public CommonAdapter mCommonAdapter;
     public List<DailyWeatherRespond.CityEntity> dailyList = new ArrayList<>();
     public CityDBHelper mDatabase;
     @Bind(android.R.id.list)
@@ -82,7 +84,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
             dailyList.clear();
             LogUtil.d("data is not empty");
             dailyList = new Gson().fromJson(data, DailyWeatherRespond.class).cityEntity;
-            mSimpleAdapter.setData(dailyList);
+            mCommonAdapter.setData(dailyList);
         } else {
             LogUtil.d("data is empty");
             mSwipeRefreshLayout.setRefreshing(true);
@@ -92,8 +94,8 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
 
     public void initUIViews(){
 
-        mSimpleAdapter = new SimpleAdapter<>(getActivity(), dailyList, null);
-        mAdapter = new SimpleRecyclerViewAdapter(mSimpleAdapter) {
+        mCommonAdapter = new CommonAdapter<>(getActivity(), dailyList, null, CommonAdapter.TYPE_WEATHER);
+        mAdapter = new SimpleRecyclerViewAdapter(mCommonAdapter) {
             @Override
             public RecyclerView.ViewHolder onCreateFooterViewHolder(LayoutInflater layoutInflater, ViewGroup viewGroup) {
                 return null;
@@ -111,6 +113,12 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
         mRecyclerView.hasFixedSize();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+
+        //recycler view item add animation
+        JazzyRecyclerViewScrollListener listener = new JazzyRecyclerViewScrollListener();
+        listener.setTransitionEffect(JazzyHelper.FLY);
+        mRecyclerView.setOnScrollListener(listener);
+
 
         int actionBarSize = ResourceUtils.getActionBarSize(getContext());
         int progressViewStart = getResources().getDimensionPixelSize(R.dimen.app_bar_height) - actionBarSize;
@@ -139,7 +147,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
             }
         }, 3000);*/
         dailyList.clear();
-        mSimpleAdapter.setData(dailyList);
+        mCommonAdapter.setData(dailyList);
         getWeatherOfCurCity();
     }
 
@@ -211,7 +219,7 @@ public class WeatherFragment extends BaseFragment implements SwipeRefreshLayout.
                     @Override
                     public void onNext(DailyWeatherRespond dailyWeatherRespond) {
                         mSwipeRefreshLayout.setRefreshing(false);
-                        mSimpleAdapter.setData(dailyWeatherRespond.cityEntity);
+                        mCommonAdapter.setData(dailyWeatherRespond.cityEntity);
                         mDatabase.commitCityInfoByType(getArgTitle(), new Gson().toJson(dailyWeatherRespond), CityDBHelper.CityColumns.DAILY_WEATHER);
 
                         LogUtil.d(dailyWeatherRespond.city.name + CommonUtil.formatDayAndMonth(dailyWeatherRespond.cityEntity.get(0).dt));

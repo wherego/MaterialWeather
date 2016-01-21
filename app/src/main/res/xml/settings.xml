@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:fitsSystemWindows="true" android:clipToPadding="false"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<PreferenceCategory android:title="@string/pref_general">
+        <SwitchPreference android:title="@string/pref_sync" android:key="pref_sync" android:summary="@string/pref_sync_summ" android:defaultValue="true" />
+        <ListPreference android:entries="@array/syncUpdateInt" android:title="@string/pref_update" android:key="prefUpdateInt" android:summary="@string/pref_update_current" android:defaultValue="4" android:entryValues="@array/syncUpdateIntValues" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_units">
+        <ListPreference android:entries="@array/syncTemperature" android:title="@string/pref_temperature" android:key="prefTempUnit" android:summary="@string/pref_temp_current" android:defaultValue="0" android:entryValues="@array/syncTemperatureValues" />
+        <ListPreference android:entries="@array/syncWindSpeed" android:title="@string/pref_wind" android:key="prefWindUnit" android:summary="@string/pref_wind_current" android:defaultValue="1" android:entryValues="@array/syncWindSpeedValues" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_noti">
+        <SwitchPreference android:title="@string/pref_noti_title" android:key="prefNoti" android:summary="@string/pref_noti_summ" android:defaultValue="false" />
+        <Preference android:title="@string/pref_noti_loc" android:key="prefNotiLoc" android:summary="@string/pref_noti_loc_summ" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_about">
+        <PreferenceScreen android:title="@string/pref_dev" android:summary="@string/pref_dev_summ">
+            <intent android:action="android.intent.action.VIEW" android:data="http://krzysztofdrobek.pl" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/pref_openweather" android:summary="@string/pref_openweather_summ">
+            <intent android:action="android.intent.action.VIEW" android:data="http://openweathermap.org/" />
+        </PreferenceScreen>
+        <Preference android:title="@string/pref_legal" android:key="legal" android:summary="@string/pref_legal_summ" />
+    </PreferenceCategory>-->
+    <PreferenceCategory android:title="General">
+        <com.geekapp.materialweather.views.MaterialSwitchPreference android:title="Update" android:key="pref_sync" android:summary="Update" android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

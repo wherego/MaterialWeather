@@ -36,11 +36,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.android.support:design:23.0.1'
-    compile 'com.android.support:cardview-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
     //use butter knife
     compile 'com.jakewharton:butterknife:7.0.1'
     //use app bar layout
@@ -53,5 +53,11 @@ dependencies {
     //use RxJava
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'io.reactivex:rxandroid:1.0.1'
-    //use log
+    //use iconify icon
+    compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.0' // (v2.0)
+    //use recyclerview animation
+    compile 'com.twotoasters.jazzylistview:library-recyclerview:1.2.1'
+    //material support library https://github.com/rey5137/material
+    compile 'com.github.rey5137:material:1.2.2'
+
 }
