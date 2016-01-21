@@ -129,7 +129,7 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHold
         private DailyWeatherRespond.CityEntity mData;
 
         public WeatherViewHolder(LayoutInflater inflater, ViewGroup parent, final OnItemClickListener onItemClickListener) {
-            super(createView(inflater, parent, R.layout.weather_adapter_item));
+            super(createView(inflater, parent, R.layout.item_weather_adapter));
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -166,7 +166,7 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHold
         private DailyWeatherRespond.CityEntity mData;
 
         public NewsViewHolder(LayoutInflater inflater, ViewGroup parent, final OnItemClickListener onItemClickListener) {
-            super(createView(inflater, parent, R.layout.weather_adapter_item));
+            super(createView(inflater, parent, R.layout.item_weather_adapter));
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -203,7 +203,7 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHold
         private DailyWeatherRespond.CityEntity mData;
 
         public PhotosViewHolder(LayoutInflater inflater, ViewGroup parent, final OnItemClickListener onItemClickListener) {
-            super(createView(inflater, parent, R.layout.weather_adapter_item));
+            super(createView(inflater, parent, R.layout.item_weather_adapter));
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -26,6 +26,9 @@ public class TabFragment extends BaseFragment {
     @Bind(R.id.view_pager)
     ViewPager mViewPager;
 
+    //collapsingde使用
+    // http://blog.csdn.net/itachi85/article/details/50492695?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io
+    //http://www.jianshu.com/p/97206f5973c5
     public static TabFragment newInstance() {
         return new TabFragment();
     }
