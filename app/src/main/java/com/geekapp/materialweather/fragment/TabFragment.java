@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.geekapp.materialweather.R;
 import com.geekapp.materialweather.activity.MainActivity;
@@ -15,7 +13,6 @@ import com.geekapp.materialweather.adapter.ViewPagerRunnableAdapter;
 import com.geekapp.materialweather.util.LogUtil;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
 public class TabFragment extends BaseFragment {
 
@@ -65,7 +62,7 @@ public class TabFragment extends BaseFragment {
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);
     }
 
-    @Override
+  /*  @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -77,5 +74,5 @@ public class TabFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
-    }
+    }*/
 }

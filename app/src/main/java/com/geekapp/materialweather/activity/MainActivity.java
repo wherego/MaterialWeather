@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +16,9 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.geekapp.materialweather.R;
-import com.geekapp.materialweather.fragment.DepthPageTransformer;
-import com.geekapp.materialweather.fragment.TabFragment;
+import com.geekapp.materialweather.fragment.OriginTabFragment;
+import com.geekapp.materialweather.verticalviewpager.VerticalDefaultTransformer;
+import com.geekapp.materialweather.verticalviewpager.VerticalViewPager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /* @Bind(R.id.toolbar)
      Toolbar mToolbar;*/
     @Bind(R.id.view_pager)
-    ViewPager mViewPager;
+    VerticalViewPager mViewPager;
     @Bind(R.id.navigation_view)
     NavigationView mNavigationView;
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mViewPager.setAdapter(new ScreenSideAdapter(getSupportFragmentManager()));
         //add animation to viewpager
-        mViewPager.setPageTransformer(true, new DepthPageTransformer());
+        mViewPager.setPageTransformer(true, new VerticalDefaultTransformer());
 
         //set drawer item listener
         mNavigationView.setNavigationItemSelectedListener(this);
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          */
         @Override
         public Fragment getItem(int position) {
-            return new TabFragment();
+            return new OriginTabFragment();
         }
 
         /**
